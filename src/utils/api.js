@@ -1,10 +1,23 @@
 import { useState, useContext, createContext } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:5000/api' : '');
+
+const getApiBaseUrl = () => {
+  if (!API_BASE_URL) {
+    throw new Error(
+      'API is not configured for production. Set VITE_API_URL in your Vercel project settings.'
+    );
+  }
+
+  return API_BASE_URL.replace(/\/$/, '');
+};
 
 // API Helper
 export const apiCall = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
+  const baseUrl = getApiBaseUrl();
 
   const headers = {
     'Content-Type': 'application/json',
@@ -16,7 +29,7 @@ export const apiCall = async (endpoint, options = {}) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       ...options,
       headers,
     });
@@ -77,6 +90,7 @@ export const healthAPI = {
 // ============ Medical Reports API ============
 export const reportsAPI = {
   upload: async (title, reportType, findings, file) => {
+    const baseUrl = getApiBaseUrl();
     const token = localStorage.getItem('token');
     const formData = new FormData();
     formData.append('title', title);
@@ -84,7 +98,7 @@ export const reportsAPI = {
     formData.append('findings', JSON.stringify(findings || {}));
     if (file) formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/reports/upload`, {
+    const response = await fetch(`${baseUrl}/reports/upload`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -100,7 +114,8 @@ export const reportsAPI = {
   getOne: (id) => apiCall(`/reports/${id}`),
 
   downloadHealthReport: async () => {
-    const response = await fetch(`${API_BASE_URL}/reports/download/health-report`);
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/reports/download/health-report`);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
