@@ -1,0 +1,1 @@
+"""Swasth AI Backend Application"""
