@@ -13,11 +13,14 @@ if __name__ == "__main__":
     os.chdir(backend_dir)
     sys.path.insert(0, backend_dir)
     
-    # Run the app
+    port = int(os.getenv("PORT", "5000"))
+    reload_enabled = os.getenv("RELOAD", "false").lower() == "true"
+
+    # Run the app (Render provides PORT at runtime)
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=5000,
-        reload=True,
-        reload_dirs=["app"]
+        port=port,
+        reload=reload_enabled,
+        reload_dirs=["app"] if reload_enabled else None
     )
