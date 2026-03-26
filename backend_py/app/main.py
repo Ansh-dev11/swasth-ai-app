@@ -21,11 +21,12 @@ app = FastAPI(
 # Configure CORS
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 FRONTEND_URL_ALT = os.getenv("FRONTEND_URL_ALT", "http://localhost:3001")
+FRONTEND_URL_VERCEL = os.getenv("FRONTEND_URL_VERCEL", "https://swasth-ai-app.vercel.app")
 VERCEL_ORIGIN_REGEX = os.getenv("VERCEL_ORIGIN_REGEX", r"https://.*\.vercel\.app")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, FRONTEND_URL_ALT, "http://localhost:*"],
+    allow_origins=[FRONTEND_URL, FRONTEND_URL_ALT, FRONTEND_URL_VERCEL, "http://localhost:*"],
     allow_origin_regex=VERCEL_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
